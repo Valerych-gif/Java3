@@ -27,7 +27,9 @@ public class FruitBox<T> {
     }
 
     public void getAllFruits (FruitBox<T> anotherBox){
-        fruits.addAll(new ArrayList<>(anotherBox.fruits));
+        if (this.equals(anotherBox)) return;
+        if (anotherBox.getWeight()==0) return;
+        this.fruits.addAll(anotherBox.fruits);
         anotherBox.fruits.clear();
     }
 
