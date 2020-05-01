@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="mainWindow" alignment="center" stylesheets="/stylesLight.css" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"
+      xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/10.0.2-internal"
+      fx:controller="client.Controller">
+    <MenuBar fx:id="menuBar">
+        <Menu text="File">
+            <MenuItem onAction="#close" text="Close">
+
+            </MenuItem>
+        </Menu>
+        <Menu text="Settings">
+            <CheckMenuItem onAction="#setTheme" text="Dark Theme">
+
+            </CheckMenuItem>
+        </Menu>
+        <Menu text="Help">
+            <MenuItem onAction="#showAbout" text="About GBChat">
+
+            </MenuItem>
+        </Menu>
+    </MenuBar>
+
+    <HBox HBox.hgrow="ALWAYS" fx:id="authPanel">
+        <TextField fx:id="loginField" HBox.hgrow="ALWAYS" promptText="Логин"/>
+        <PasswordField fx:id="passField" HBox.hgrow="ALWAYS" promptText="Пароль" onAction="#sendAuth"/>
+        <Button text="Подключиться" onAction="#sendAuth"/>
+        <Button text="Зарегистрироваться" onAction="#registration"/>
+    </HBox>
+
+    <HBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+        <VBox HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+
+            <TextArea fx:id="textArea" editable="false" focusTraversable="false" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+
+            </TextArea>
+
+            <HBox HBox.hgrow="ALWAYS">
+                <TextField fx:id="messageField" onAction="#sendMsg"  HBox.hgrow="ALWAYS"/>
+                <Button onAction="#sendMsg" text="Send" prefWidth="100"/>
+            </HBox>
+
+        </VBox>
+        <ListView prefWidth="200.0" HBox.hgrow="ALWAYS" fx:id="clientsList">
+
+        </ListView>
+    </HBox>
+
+
+</VBox>

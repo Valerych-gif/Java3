@@ -1,0 +1,31 @@
+.menu-bar {
+    -fx-background-color: #ffffff;
+}
+
+.label {
+    -fx-text-fill: #000000;
+}
+
+.menu {
+    -fx-background-color: #ffffff;
+}
+
+.menu:hover {
+    -fx-background-color: #dddddd;
+}
+
+.menu-item{
+    -fx-background-color: #ffffff;
+}
+
+.menu-item:hover{
+    -fx-background-color: #dddddd;
+}
+
+.check-menu-item{
+    -fx-background-color: #ffffff;
+}
+
+.check-menu-item:hover{
+    -fx-background-color: #dddddd;
+}
