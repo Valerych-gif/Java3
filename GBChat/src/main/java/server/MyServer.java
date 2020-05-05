@@ -26,7 +26,6 @@ public class MyServer {
     public MyServer() {
         try (ServerSocket server = new ServerSocket(PORT)) {
             dbController = new DBController();
-            dbController.start();
             authService = new DBAuthService(dbController);
             authService.start();
             clients = new HashMap<>();
@@ -37,13 +36,12 @@ public class MyServer {
                 System.out.println("Клиент подключился");
                 new ClientHandler(this, socket);
             }
-        } catch (IOException | SQLException | ClassNotFoundException e) {
+        } catch (IOException e) {
             System.out.println("Ошибка в работе сервера");
             e.printStackTrace();
         } finally {
             if (authService != null) {
                 authService.stop();
-                dbController.stop();
             }
         }
     }

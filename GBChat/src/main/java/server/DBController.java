@@ -7,9 +7,14 @@ public class DBController {
     private PreparedStatement statement;
     private ResultSet rs;
 
-    public void start() throws SQLException, ClassNotFoundException {
-        Class.forName("org.sqlite.JDBC");
-        conn = DriverManager.getConnection("jdbc:sqlite:gbchat.db");
+    public void start() {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:gbchat.db");
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void stop(){
@@ -22,6 +27,7 @@ public class DBController {
 
     public String getNickByLoginPass(String login, String pass) {
         String nick=null;
+        start();
         try {
             statement = conn.prepareStatement("SELECT * FROM Auth WHERE login=? AND pass=?");
             statement.setString(1, login);
@@ -34,10 +40,12 @@ public class DBController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        stop();
         return nick;
     }
 
     public void changeNick (String originalNick, String newNick){
+        start();
         try {
             statement = conn.prepareStatement("UPDATE Auth SET nick = ? WHERE nick=?");
             statement.setString(1, newNick);
@@ -46,9 +54,11 @@ public class DBController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        stop();
     }
 
     public boolean isNickBusy(String nick) {
+        start();
         try {
             statement = conn.prepareStatement("SELECT * FROM Auth WHERE nick=?");
             statement.setString(1, nick);
@@ -56,10 +66,12 @@ public class DBController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        stop();
         return false;
     }
 
     public boolean registration(String login, String password, String nick) {
+        start();
         try {
             statement = conn.prepareStatement("SELECT * FROM Auth WHERE login=? OR nick=?");
             statement.setString(1, login);
@@ -73,6 +85,7 @@ public class DBController {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        stop();
         return false;
     }
 }

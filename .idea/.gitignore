@@ -1,0 +1,28 @@
+# compiled output
+/dist
+/dist-server
+/tmp
+/out-tsc
+/out
+target/
+
+# IDEs and editors
+/.idea/
+.project
+.classpath
+.c9/
+*.iml
+*.launch
+.settings/
+*.sublime-workspace
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Log files
+/Logs/
+*.log
+
+# Databases
+*.db
