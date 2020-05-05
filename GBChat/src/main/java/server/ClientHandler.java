@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientHandler {
     private MyServer myServer;
@@ -31,7 +33,9 @@ public class ClientHandler {
             this.authService = myServer.getAuthService();
             this.dbController = myServer.getDbController();
 
-            new Thread(()->{
+            ExecutorService executorService = Executors.newCachedThreadPool();
+
+            executorService.execute(()->{
                 try {
                     Thread.sleep(AUTH_TIMER);
                 } catch (InterruptedException e) {
@@ -42,8 +46,9 @@ public class ClientHandler {
                     System.out.println("Клиент отключен от соединения по тайм-ауту");
                     closeConnection();
                 }
-            }).start();
-            new Thread(() -> {
+            });
+
+            executorService.execute(() -> {
                 try {
                     authentication();
                     readMessages();
@@ -52,7 +57,8 @@ public class ClientHandler {
                 } finally {
                     closeConnection();
                 }
-            }).start();
+            });
+
         } catch (IOException e) {
             throw new RuntimeException("Проблемы при создании обработчика клиента");
         }
