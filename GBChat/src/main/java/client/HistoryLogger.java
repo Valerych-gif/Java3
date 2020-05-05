@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class Logger {
+public class HistoryLogger {
 
     private static List<String> log = new ArrayList<>();
 
@@ -14,7 +14,7 @@ public class Logger {
         return log;
     }
 
-    public static void log (String login, String nick, String logLine){
+    public static void logHistory(String login, String nick, String logLine){
         String logFileName = String.format("Logs/history_%s.log", login);
         File logFile = new File(logFileName);
         if (!logFile.exists()) {
@@ -32,7 +32,7 @@ public class Logger {
         }
     }
 
-    public static void readLogFile(File logFile) {
+    public static void readHistoryLogFile(File logFile) {
         try (BufferedReader br = new BufferedReader(new FileReader(logFile))){
             log.clear();
             while (br.ready()){

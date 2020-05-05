@@ -83,7 +83,7 @@ public class Controller implements Initializable {
             messageField.clear();
             messageField.requestFocus();
             if (LOGGER_IS_ON) {
-                Logger.log(login, nickname, msg);
+                HistoryLogger.logHistory(login, nickname, msg);
             }
         }
     }
@@ -105,8 +105,8 @@ public class Controller implements Initializable {
             setAuthenticated(true);
             nickname = args[0].toString();
             if (LOGGER_IS_ON){
-                Logger.readLogFile(new File(String.format("Logs/history_%s.log", login)));
-                List<String> log = Logger.getLog();
+                HistoryLogger.readHistoryLogFile(new File(String.format("Logs/history_%s.log", login)));
+                List<String> log = HistoryLogger.getLog();
                 for (int i = 0; (i < log.size())&&i<QUANTITY_OF_MESSAGE; i++) {
                     textArea.appendText(log.get(i) + "\n");
                 }

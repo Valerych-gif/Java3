@@ -7,7 +7,7 @@
 target/
 
 # IDEs and editors
-/.idea
+/.idea/
 .project
 .classpath
 .c9/
@@ -19,4 +19,10 @@ target/
 # System Files
 .DS_Store
 Thumbs.db
+
+# Log files
 /Logs/
+*.log
+
+# Databases
+*.db
