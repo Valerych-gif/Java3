@@ -1,0 +1,30 @@
+package client;
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+public class GBChat extends Application {
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gbchat.fxml"));
+        Parent root = loader.load();
+        primaryStage.setTitle("GBChat");
+        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.show();
+
+        primaryStage.setOnCloseRequest(e -> {
+            ((Controller) loader.getController()).close();
+        });
+
+    }
+
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}

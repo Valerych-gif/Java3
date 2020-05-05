@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+
+            prefHeight="100.0" prefWidth="300.0">
+    <VBox alignment="TOP_CENTER">
+        <HBox>
+            <Label text="Логин" prefWidth="100">Логин</Label>
+            <TextField fx:id="login" />
+        </HBox>
+        <HBox>
+            <Label text="Пароль" prefWidth="100">Пароль</Label>
+            <TextField fx:id="pass" />
+        </HBox>
+        <HBox>
+            <Label text="Ник" prefWidth="100">Ник</Label>
+            <TextField fx:id="nick" />
+        </HBox>
+    </VBox>
+
+</AnchorPane>
