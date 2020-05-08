@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MyServer {
     private final int PORT = 8189;
@@ -29,12 +31,15 @@ public class MyServer {
             authService = new DBAuthService(dbController);
             authService.start();
             clients = new HashMap<>();
+            ExecutorService executorService = Executors.newCachedThreadPool();
 
             while (true) {
                 System.out.println("Сервер ожидает подключения");
                 Socket socket = server.accept();
                 System.out.println("Клиент подключился");
-                new ClientHandler(this, socket);
+                executorService.execute(() -> {
+                    new ClientHandler(this, socket);
+                });
             }
         } catch (IOException e) {
             System.out.println("Ошибка в работе сервера");

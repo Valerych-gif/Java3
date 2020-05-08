@@ -4,8 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ClientHandler {
     private MyServer myServer;
@@ -33,31 +31,29 @@ public class ClientHandler {
             this.authService = myServer.getAuthService();
             this.dbController = myServer.getDbController();
 
-            ExecutorService executorService = Executors.newCachedThreadPool();
 
-            executorService.execute(()->{
+            new Thread(() -> {
                 try {
                     Thread.sleep(AUTH_TIMER);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (name==null){
+                if (name == null) {
                     sendMsg("/end");
                     System.out.println("Клиент отключен от соединения по тайм-ауту");
                     closeConnection();
                 }
-            });
+            }).start();
 
-            executorService.execute(() -> {
-                try {
-                    authentication();
-                    readMessages();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    closeConnection();
-                }
-            });
+
+            try {
+                authentication();
+                readMessages();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                closeConnection();
+            }
 
         } catch (IOException e) {
             throw new RuntimeException("Проблемы при создании обработчика клиента");
@@ -69,7 +65,7 @@ public class ClientHandler {
             String str = in.readUTF();
             if (str.startsWith("/auth")) {
                 String[] parts = str.split("\\s");
-                if (parts.length==3){
+                if (parts.length == 3) {
                     String login = parts[1];
                     String password = parts[2];
                     String nick = authService.getNickByLoginPass(login, password);
@@ -89,13 +85,13 @@ public class ClientHandler {
                 }
             }
 
-            if (str.startsWith("/reg")){
+            if (str.startsWith("/reg")) {
                 String[] parts = str.split("\\s");
-                if (parts.length==4){
+                if (parts.length == 4) {
                     String login = parts[1];
                     String password = parts[2];
                     String nick = parts[3];
-                    if (dbController.registration(login, password, nick)){
+                    if (dbController.registration(login, password, nick)) {
                         sendMsg("/authok " + nick);
                         name = nick;
                         myServer.broadcastMsg(name + " зашел в чат");
@@ -127,7 +123,7 @@ public class ClientHandler {
                 myServer.broadcastMsg(name + ": " + strFromClient);
             }
 
-            if (strFromClient.startsWith("/chnick")){
+            if (strFromClient.startsWith("/chnick")) {
                 changeNick(strFromClient);
             }
 
@@ -138,13 +134,13 @@ public class ClientHandler {
         String[] parts = str.split("\\s");
         String nick;
 
-        if (parts.length>1) {
+        if (parts.length > 1) {
             nick = parts[1];
         } else return;
 
-        if (!dbController.isNickBusy(nick)){
+        if (!dbController.isNickBusy(nick)) {
             dbController.changeNick(name, nick);
-            name=nick;
+            name = nick;
             sendMsg("/newnick " + name);
             myServer.refreshClientsList();
         } else {
