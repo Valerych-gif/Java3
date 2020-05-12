@@ -1,5 +1,8 @@
 package server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,6 +16,8 @@ public class ClientHandler {
     private AuthService authService;
     private DBController dbController;
     private static final int AUTH_TIMER = 120_000;
+
+    Logger logger = LogManager.getLogger(ClientHandler.class);
 
     private String name;
 
@@ -40,7 +45,7 @@ public class ClientHandler {
                 }
                 if (name == null) {
                     sendMsg("/end");
-                    System.out.println("Клиент отключен от соединения по тайм-ауту");
+                    logger.info("Клиент отключен от соединения по тайм-ауту");
                     closeConnection();
                 }
             }).start();
@@ -56,7 +61,8 @@ public class ClientHandler {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Проблемы при создании обработчика клиента");
+            logger.error("Проблемы при создании обработчика клиента", e);
+            throw new RuntimeException();
         }
     }
 
@@ -64,6 +70,7 @@ public class ClientHandler {
         while (true) {
             String str = in.readUTF();
             if (str.startsWith("/auth")) {
+                logger.info("Получен запрос на авторизацию");
                 String[] parts = str.split("\\s");
                 if (parts.length == 3) {
                     String login = parts[1];
@@ -72,20 +79,24 @@ public class ClientHandler {
                     if (nick != null) {
                         if (!myServer.isNickBusy(nick)) {
                             sendMsg("/authok " + nick);
+                            logger.info("Пользователь авторизовался под ником '{}'", nick);
                             name = nick;
                             myServer.broadcastMsg(name + " зашел в чат");
                             myServer.subscribe(this);
                             return;
                         } else {
+                            logger.info("Пользователь попытался подключиться под уже используемой учетной записью");
                             sendMsg("Учетная запись уже используется");
                         }
                     } else {
+                        logger.info("Пользователь ввел неверный логин или пароль");
                         sendMsg("Неверные логин/пароль");
                     }
                 }
             }
 
             if (str.startsWith("/reg")) {
+                logger.info("Получен запрос на регистрацию");
                 String[] parts = str.split("\\s");
                 if (parts.length == 4) {
                     String login = parts[1];
@@ -93,11 +104,13 @@ public class ClientHandler {
                     String nick = parts[3];
                     if (dbController.registration(login, password, nick)) {
                         sendMsg("/authok " + nick);
+                        logger.info("Отправлено сообщение формата '/authok {}'", nick);
                         name = nick;
                         myServer.broadcastMsg(name + " зашел в чат");
                         myServer.subscribe(this);
                         return;
                     } else {
+                        logger.info("Неудачная попытка регистрации. Пользователю отправлено сообщение '/regfail'");
                         sendMsg("/regfail");
                     }
 
@@ -110,7 +123,7 @@ public class ClientHandler {
     public void readMessages() throws IOException {
         while (true) {
             String strFromClient = in.readUTF();
-            System.out.println("от " + name + ": " + strFromClient);
+
 
             if (strFromClient.equals("/end")) {
                 closeConnection();
@@ -120,6 +133,7 @@ public class ClientHandler {
             if (strFromClient.startsWith("/w")) {
                 sendMessageToCertainClient(strFromClient);
             } else {
+                logger.info("Получено сообщение от " + name + ": " + strFromClient);
                 myServer.broadcastMsg(name + ": " + strFromClient);
             }
 
@@ -139,16 +153,19 @@ public class ClientHandler {
         } else return;
 
         if (!dbController.isNickBusy(nick)) {
+            logger.info("Пользователь {} запросил смену ника на ник {}", name, nick);
             dbController.changeNick(name, nick);
             name = nick;
             sendMsg("/newnick " + name);
             myServer.refreshClientsList();
         } else {
+            logger.info("Пользователю {} не удалось сменить ник", name);
             sendMsg("Данный ник уже занят");
         }
     }
 
     private void sendMessageToCertainClient(String str) {
+        logger.info("Пользователь {} отправил личное сообщение другому пользователю", name);
         String[] parts = str.split("\\s");
         String nick = parts[1];
         String message = name + "->" + nick + ": " + parts[2];
@@ -166,6 +183,7 @@ public class ClientHandler {
     public void closeConnection() {
         myServer.unsubscribe(this);
         myServer.broadcastMsg(name + " вышел из чата");
+        logger.info(name + " вышел из чата");
         try {
             in.close();
         } catch (IOException e) {

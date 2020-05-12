@@ -1,9 +1,12 @@
 package server;
 
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +17,7 @@ public class MyServer {
 
     private Map<String, ClientHandler> clients;
     private AuthService authService;
+    private static final Logger logger = LogManager.getLogger(MyServer.class);
 
     private DBController dbController;
 
@@ -34,15 +38,15 @@ public class MyServer {
             ExecutorService executorService = Executors.newCachedThreadPool();
 
             while (true) {
-                System.out.println("Сервер ожидает подключения");
+                logger.info("Сервер ожидает подключения");
                 Socket socket = server.accept();
-                System.out.println("Клиент подключился");
+                logger.info("Клиент подключился");
                 executorService.execute(() -> {
                     new ClientHandler(this, socket);
                 });
             }
         } catch (IOException e) {
-            System.out.println("Ошибка в работе сервера");
+            logger.error("Ошибка в работе сервера");
             e.printStackTrace();
         } finally {
             if (authService != null) {
