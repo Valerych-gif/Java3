@@ -35,7 +35,6 @@ public class DBController {
             rs=statement.executeQuery();
             if (rs.next()) {
                 nick = rs.getString("nick");
-                System.out.println(nick);
             }
         } catch (SQLException e) {
             e.printStackTrace();
