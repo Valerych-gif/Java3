@@ -1,11 +1,15 @@
 package server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 
 public class DBController {
     private Connection conn;
     private PreparedStatement statement;
     private ResultSet rs;
+    Logger logger = LogManager.getLogger(DBController.class);
 
     public void start() {
         try {
@@ -56,6 +60,17 @@ public class DBController {
         stop();
     }
 
+    public void registration(String login, String password, String nick) {
+        start();
+        try {
+            if (!(isLoginBusy(login)||isNickBusy(nick))) {
+                regNewClient(login, password, nick);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        stop();
+    }
     public boolean isNickBusy(String nick) {
         start();
         try {
@@ -68,23 +83,23 @@ public class DBController {
         stop();
         return false;
     }
-
-    public boolean registration(String login, String password, String nick) {
-        start();
+    public boolean isLoginBusy(String login){
         try {
-            statement = conn.prepareStatement("SELECT * FROM Auth WHERE login=? OR nick=?");
+            statement = conn.prepareStatement("SELECT * FROM Auth WHERE login=?");
             statement.setString(1, login);
-            statement.setString(2, nick);
-            if(statement.executeQuery().next()) return false;
-            statement = conn.prepareStatement("INSERT INTO Auth (login, pass, nick) VALUES (?, ?, ?)");
-            statement.setString(1, login);
-            statement.setString(2, password);
-            statement.setString(3, nick);
-            return (statement.executeUpdate()!=0);
+            return statement.executeQuery().next();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        stop();
         return false;
     }
+
+    private void regNewClient(String login, String password, String nick) throws SQLException {
+        statement = conn.prepareStatement("INSERT INTO Auth (login, pass, nick) VALUES (?, ?, ?)");
+        statement.setString(1, login);
+        statement.setString(2, password);
+        statement.setString(3, nick);
+        statement.executeUpdate();
+    }
+
 }
