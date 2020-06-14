@@ -54,9 +54,7 @@ public class MyServer {
             logger.info("Сервер ожидает подключения");
             Socket socket = server.accept();
             logger.info("Клиент подключился");
-            clientExecutorService.execute(() -> {
-                new ClientHandler(this, socket);
-            });
+            clientExecutorService.execute(() -> new ClientHandler(this, socket));
         }
     }
 
@@ -67,16 +65,16 @@ public class MyServer {
         }
     }
 
-    public synchronized void broadcastMsg(String msg) {
+    public synchronized void broadcastMessage(String message) {
         for (ClientHandler o : clients.values()) {
-            o.sendMsg(msg);
+            o.sendMessage(message);
         }
     }
 
-    public synchronized void sendMessageToCertainClient(String nick, String msg) {
+    public synchronized void sendMessageToCertainClient(String clientNick, String message) {
         for (ClientHandler o : clients.values()) {
-            if (o.getName().equals(nick)){
-                o.sendMsg(msg);
+            if (o.getName().equals(clientNick)){
+                o.sendMessage(message);
             }
         }
     }
@@ -96,6 +94,6 @@ public class MyServer {
         for (ClientHandler client : clients.values()) {
             clientList.append(' ').append(client.getName());
         }
-        broadcastMsg("/clients"+clientList);
+        broadcastMessage("/clients"+clientList);
     }
 }

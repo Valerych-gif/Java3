@@ -41,7 +41,6 @@ public class ClientHandler {
 
         } catch (IOException e) {
             logger.error("Проблемы при создании обработчика клиента", e);
-            throw new RuntimeException();
         }
     }
 
@@ -64,14 +63,14 @@ public class ClientHandler {
                 e.printStackTrace();
             }
             if (name == null) {
-                sendMsg("/end");
+                sendMessage("/end");
                 logger.info("Клиент отключен от соединения по тайм-ауту");
                 closeConnection();
             }
         }).start();
     }
 
-    public void authOrRegCheck() throws IOException {
+    private void authOrRegCheck() throws IOException {
         while (true) {
             String str = in.readUTF();
             if (str.startsWith("/auth")) {
@@ -109,14 +108,14 @@ public class ClientHandler {
 
     private void sendWrongLoginOrPassMessage() {
         logger.info("Пользователь ввел неверный логин или пароль");
-        sendMsg("Неверные логин/пароль");
+        sendMessage("Неверные логин/пароль");
     }
 
     private void connectClient() {
         name = nickFromAuthDB;
         myServer.subscribe(this);
-        sendMsg("/authok " + name);
-        myServer.broadcastMsg(name + " зашел в чат");
+        sendMessage("/authok " + name);
+        myServer.broadcastMessage(name + " зашел в чат");
         logger.info("Пользователь авторизовался под ником '{}'", name);
     }
 
@@ -132,7 +131,7 @@ public class ClientHandler {
                 return true;
             } else {
                 logger.info("Неудачная попытка регистрации. Пользователю отправлено сообщение '/regfail'");
-                sendMsg("/regfail");
+                sendMessage("/regfail");
             }
         }
         return false;
@@ -142,12 +141,12 @@ public class ClientHandler {
         dbController.registration(login, password, nick);
         name = nick;
         myServer.subscribe(this);
-        sendMsg("/authok " + name);
-        myServer.broadcastMsg(name + " зашел в чат");
+        sendMessage("/authok " + name);
+        myServer.broadcastMessage(name + " зашел в чат");
         logger.info("Отправлено сообщение формата '/authok {}'", name);
     }
 
-    public void readMessages() throws IOException {
+    private void readMessages() throws IOException {
         while (true) {
             String strFromClient = in.readUTF();
 
@@ -167,8 +166,7 @@ public class ClientHandler {
             }
 
             logger.info("Получено сообщение от " + name + ": " + strFromClient);
-            myServer.broadcastMsg(name + ": " + strFromClient);
-
+            myServer.broadcastMessage(name + ": " + strFromClient);
 
         }
     }
@@ -185,11 +183,11 @@ public class ClientHandler {
             logger.info("Пользователь {} запросил смену ника на ник {}", name, nick);
             dbController.changeNick(name, nick);
             name = nick;
-            sendMsg("/newnick " + name);
+            sendMessage("/newnick " + name);
             myServer.refreshClientsList();
         } else {
             logger.info("Пользователю {} не удалось сменить ник", name);
-            sendMsg("Данный ник уже занят");
+            sendMessage("Данный ник уже занят");
         }
     }
 
@@ -201,7 +199,7 @@ public class ClientHandler {
         myServer.sendMessageToCertainClient(nick, message);
     }
 
-    public void sendMsg(String msg) {
+    public void sendMessage(String msg) {
         try {
             out.writeUTF(msg);
         } catch (IOException e) {
@@ -209,9 +207,9 @@ public class ClientHandler {
         }
     }
 
-    public void closeConnection() {
+    private void closeConnection() {
         myServer.unsubscribe(this);
-        myServer.broadcastMsg(name + " вышел из чата");
+        myServer.broadcastMessage(name + " вышел из чата");
         logger.info(name + " вышел из чата");
         try {
             in.close();

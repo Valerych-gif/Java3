@@ -1,8 +1,12 @@
 package server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class DBAuthService implements AuthService {
 
     private DBController dbController;
+    private static final Logger logger = LogManager.getLogger(MyServer.class);
 
     public DBAuthService(DBController dbController) {
         this.dbController = dbController;
@@ -10,12 +14,12 @@ public class DBAuthService implements AuthService {
 
     @Override
     public void start() {
-        System.out.println("Сервис аутентификации запущен");
+        logger.info("Сервис аутентификации запущен");
     }
 
     @Override
     public void stop() {
-        System.out.println("Сервис аутентификации остановлен");
+        logger.info("Сервис аутентификации остановлен");
     }
 
     @Override
